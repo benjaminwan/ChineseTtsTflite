@@ -77,4 +77,9 @@ dependencies {
 
     //Logger
     implementation 'com.orhanobut:logger:2.2.0'
+
+    // Tensorflow Lite
+    implementation 'org.tensorflow:tensorflow-lite:2.6.0'
+    implementation 'org.tensorflow:tensorflow-lite-select-tf-ops:2.6.0'
+    implementation 'org.tensorflow:tensorflow-lite-support:0.2.0'
 }
