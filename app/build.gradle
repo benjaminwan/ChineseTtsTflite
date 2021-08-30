@@ -82,4 +82,7 @@ dependencies {
     implementation 'org.tensorflow:tensorflow-lite:2.6.0'
     implementation 'org.tensorflow:tensorflow-lite-select-tf-ops:2.6.0'
     implementation 'org.tensorflow:tensorflow-lite-support:0.2.0'
+
+    // https://github.com/belerweb/pinyin4j
+    implementation 'com.belerweb:pinyin4j:2.5.1'
 }
