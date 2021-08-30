@@ -35,14 +35,14 @@ $ pip install git+https://github.com/repodiac/german_transliterate.git
 
 解压models-tf.7z
 
-1. 模型测试
+1. TF模型测试
 
 ```shell
 $ cd models-tf
 $ python test-h5.py
 ```
 
-2. 模型转换
+2. TF模型转TFLite
 
 ```shell
 $ python convert-tflite.py
