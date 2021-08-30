@@ -1,0 +1,153 @@
+name: Android CI
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - '*.*.*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      # 检出代码
+      - uses: actions/checkout@v2
+
+      - name: Unshallow
+        run: git fetch --prune --unshallow
+
+      # 设置JDK版本
+      - name: set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      # 缓存依赖项
+      # https://docs.github.com/cn/actions/guides/building-and-testing-java-with-gradle#caching-dependencies
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # 下载models-tflite.7z并解压到app/src/main/assets
+      - name: Download 下载models-tflite.7z
+        run: |
+          wget https://github.com/benjaminwan/ChineseTtsTflite/releases/download/init/models-tflite.7z -O models-tflite.7z
+          7z x models-tflite.7z -aoa
+          mv models-tflite app/src/main/assets
+
+      # Assemble Release apk
+      - name: Build with Gradle
+        run: chmod +x gradlew &&./gradlew assembleRelease
+
+      # 清除部分Gradle缓存
+      - name: Cleanup Gradle Cache
+        run: |
+          rm -f ~/.gradle/caches/modules-2/modules-2.lock
+          rm -f ~/.gradle/caches/modules-2/gc.properties
+
+      # 上传apk 到action(需要定制)
+      # https://github.com/marketplace/actions/upload-a-build-artifact
+      - name: Upload APK/AAR
+        uses: actions/upload-artifact@v2
+        with:
+          name: outputs
+          path: |
+            app/build/outputs/apk/release/*.apk
+
+      # 获取demo apk路径
+      - name: Get apk path
+        id: apk-path
+        run: |
+          path=$(find app/build/outputs/apk/release -name '*.apk' -type f | head -1)
+          echo "::set-output name=path::$path"
+
+      # 获取apk版本号
+      # https://github.com/marketplace/actions/apk-info-action
+      - name: Get apk info
+        id: apk-info
+        uses: hkusu/apk-info-action@v1
+        with:
+          apk-path: ${{ steps.apk-path.outputs.path }}
+
+      # 获取指定时区的时间
+      # https://github.com/marketplace/actions/get-time-action
+      - name: Get Time
+        id: time
+        uses: JantHsueh/get-time-action@master
+        with:
+          timeZone: 8
+
+      # 获取git log 从 previousTag 到 lastTag
+      - name: Get git log
+        id: git-log
+        run: |
+          previousTag=$(git describe --abbrev=0 --tags `git rev-list --tags --skip=1 --max-count=1`)
+          lastTag=$(git describe --abbrev=0 --tags)
+          echo "previousTag:$previousTag ~ lastTag:$lastTag"
+          log=$(git log $previousTag..$lastTag --pretty=format:'- %cd %an: %s\n' --date=format:'%Y-%m-%d %H:%M:%S')
+          echo "$log"
+          echo "::set-output name=log::"$log""
+
+      # 显示信息(需要定制)
+      - name: Show info
+        if: always()
+        run: |
+          echo '${{ steps.apk-path.outputs.path }}'
+          echo '${{ steps.apk-info.outputs.result }}' # get apk info success or failure
+          echo '${{ steps.time.outputs.time }}'
+          echo '${{ steps.git-log.outputs.log }}'
+          echo '${{ steps.apk-info.outputs.application-name }}'
+          echo '${{ steps.apk-info.outputs.application-id }}'
+          echo '${{ steps.apk-info.outputs.version-code }}'
+          echo '${{ steps.apk-info.outputs.version-name }}'
+          echo '${{ steps.apk-info.outputs.min-sdk-version }}'
+          echo '${{ steps.apk-info.outputs.target-sdk-version }}'
+          echo '${{ steps.apk-info.outputs.compile-sdk-version }}'
+          echo '${{ steps.apk-info.outputs.uses-permissions }}'
+          echo '${{ steps.apk-info.outputs.debuggable }}'
+          echo '${{ steps.apk-info.outputs.allow-backup }}'
+          echo '${{ steps.apk-info.outputs.supports-rtl }}'
+          echo '${{ steps.apk-info.outputs.file-size }}'
+          echo '${{ steps.apk-info.outputs.readable-file-size }}'
+
+      # 向钉钉发送消息
+      # https://github.com/marketplace/actions/web-request-action
+      - name: dingtalk
+        uses: satak/webrequest-action@master
+        with:
+          url: ${{ secrets.DINGTALK_WEBHOOK }}
+          method: POST
+          payload: '{"msgtype": "text", "text": {"content": "版本更新: ${{ steps.apk-info.outputs.application-name }}-版本号: ${{ steps.apk-info.outputs.version-name }} \n 编译时间： ${{ steps.time.outputs.time }} \n 距上个正式版的更新记录: \n${{ steps.git-log.outputs.log }}"}}'
+          headers: '{"Content-Type": "application/json"}'
+
+      # 创建Changelog文件 triggered by git tag push
+      - name: Generate Changelog
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+            echo -e '${{ steps.git-log.outputs.log }}' > Release.txt
+
+      # Cat Changelog triggered by git tag push
+      - name: Cat Changelog
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+            cat Release.txt
+
+      # 创建Release triggered by git tag push(需要定制)
+      # https://github.com/marketplace/actions/gh-release
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          body_path: Release.txt
+          draft: true
+          files: |
+            ${{ steps.apk-path.outputs.path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
