@@ -1,6 +1,5 @@
 package com.benjaminwan.compose.chinesettstflite.tts
 
-import android.annotation.SuppressLint
 import com.orhanobut.logger.Logger
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter

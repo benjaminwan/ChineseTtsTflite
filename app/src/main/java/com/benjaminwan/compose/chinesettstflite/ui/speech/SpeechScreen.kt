@@ -11,7 +11,6 @@ import com.benjaminwan.compose.chinesettstflite.tts.TtsManager
 
 @Composable
 fun SpeechScreen() {
-    //var speechText by remember { mutableStateOf("君不见,黄河之水天上来,奔流到海不复回,君不见,高堂明镜悲白发,朝如青丝暮成雪,人生得意须尽欢,莫使金樽空对月") }
     var speechText by remember { mutableStateOf("时间就像海绵里的水，只要愿挤，总还是有的。其实地上本没有路，走的人多了，也便成了路。") }
     val ttsType by TtsManager.ttsTypeState
     val speed by TtsManager.speedState
@@ -57,15 +56,27 @@ fun SpeechScreen() {
         ) {
             Text(text = "语速控制：")
             Row {
-                RadioButton(selected = speed == 1.2f, onClick = { TtsManager.speed = 1.2f }, enabled = speedEnable && ttsReady)
+                RadioButton(
+                    selected = speed == 1.2f,
+                    onClick = { TtsManager.speed = 1.2f },
+                    enabled = speedEnable && ttsReady
+                )
                 Text(text = "慢")
             }
             Row {
-                RadioButton(selected = speed == 1.0f, onClick = { TtsManager.speed = 1.0f }, enabled = speedEnable && ttsReady)
+                RadioButton(
+                    selected = speed == 1.0f,
+                    onClick = { TtsManager.speed = 1.0f },
+                    enabled = speedEnable && ttsReady
+                )
                 Text(text = "普通")
             }
             Row {
-                RadioButton(selected = speed == 0.8f, onClick = { TtsManager.speed = 0.8f }, enabled = speedEnable && ttsReady)
+                RadioButton(
+                    selected = speed == 0.8f,
+                    onClick = { TtsManager.speed = 0.8f },
+                    enabled = speedEnable && ttsReady
+                )
                 Text(text = "快")
             }
         }
