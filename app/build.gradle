@@ -4,6 +4,19 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        debug {
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+            storeFile file("../appkey/debug.keystore")
+        }
+        tts {
+            keyAlias 'chttstf'
+            keyPassword 'chttstf'
+            storeFile file('../appkey/chttstf.keystore')
+            storePassword 'chttstf'
+        }
+    }
     compileSdk 31
 
     defaultConfig {
@@ -20,7 +33,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
         release {
+            signingConfig signingConfigs.tts
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
