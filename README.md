@@ -1,13 +1,24 @@
 # Chinese TTS TF Lite
 
-### APP开发中……
+### APP编译说明
+
+1. Android 2020.3.1
+2. 从下面的模型下载地址，下载models-tflite.7z，把如下4个文件解压到对应目录
+
+```
+├─app/src/main/assets/assets
+│      baker_mapper.json
+│      fastspeech2_quan.tflite
+│      mb_melgan.tflite
+│      tacotron2_quan.tflite
+   ```
 
 ### 模型下载
 
 [下载地址](https://github.com/benjaminwan/ChineseTtsTflite/releases/tag/init)
 
-- models-tf.7z : 原始TensorflowTTS模型
-- models-tflite.7z : 转换后的TFLite模型
+- models-tf.7z : 原始TensorflowTTS模型，一般用于PC端
+- models-tflite.7z : 转换后的TFLite模型，一般用于移动端
 
 ### 模型查看
 
