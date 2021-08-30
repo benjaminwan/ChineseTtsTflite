@@ -103,15 +103,15 @@ object TtsManager {
         ttsState.value = TtsState(isStart = false)
     }
 
-    fun input(input: String) {
+    fun input(inputText: String) {
         inputTextJob = flow {
-            emit(input)
+            emit(inputText)
         }.flowOn(Dispatchers.IO)
             .catch { error -> error.printStackTrace() }
             .onStart { ttsState.value = TtsState(isStart = true) }
             .onEach { input ->
                 val regex = Regex("[\n，。？?！!,;；]")
-                val sentences = input.split(regex)
+                val sentences = input.split(regex).filter { it.isNotBlank() }
                 val size = sentences.size
                 sentences.forEachIndexed { index, s ->
                     if (currentCoroutineContext().isActive) {
