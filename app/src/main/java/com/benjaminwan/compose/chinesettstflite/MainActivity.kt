@@ -11,13 +11,14 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.benjaminwan.compose.chinesettstflite.tts.TtsManager
 import com.benjaminwan.compose.chinesettstflite.ui.speech.SpeechScreen
 import com.benjaminwan.compose.chinesettstflite.ui.theme.ChineseTtsTfliteTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        TtsManager.initModels(this)
         setContent {
             ChineseTtsTfliteTheme {
                 Surface(color = MaterialTheme.colors.background) {
