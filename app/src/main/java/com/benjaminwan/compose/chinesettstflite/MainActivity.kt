@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.benjaminwan.compose.chinesettstflite.tts.TtsManager
 import com.benjaminwan.compose.chinesettstflite.ui.speech.SpeechScreen
@@ -38,10 +39,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainTopAppBar() {
-    val title = "TTS"
     TopAppBar(
         title = {
-            Text(text = title, maxLines = 2)
+            Text(text = stringResource(R.string.app_name), maxLines = 2)
         },
         modifier = Modifier
             .requiredHeight(42.dp)
