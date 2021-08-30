@@ -87,3 +87,6 @@ lint/tmp/
 
 # schemas
 schemas/
+
+# assets
+app/src/main/assets/
