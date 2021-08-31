@@ -4,15 +4,17 @@ import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
-import com.benjaminwan.chinesettstflite.models.AudioData
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 
-object AudioPlayer {
-    private const val SAMPLE_RATE = 24000
-    private const val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_FLOAT
-    private const val CHANNEL_CONFIG = AudioFormat.CHANNEL_OUT_MONO
+class AudioPlayer {
+    companion object {
+        private const val SAMPLE_RATE = 24000
+        private const val AUDIO_FORMAT = AudioFormat.ENCODING_PCM_FLOAT
+        private const val CHANNEL_CONFIG = AudioFormat.CHANNEL_OUT_MONO
+    }
+
     private val audioAttributes = AudioAttributes.Builder()
         .setUsage(AudioAttributes.USAGE_MEDIA)
         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
@@ -29,12 +31,11 @@ object AudioPlayer {
         audioTrack.play()
     }
 
-    fun stop() {
+    fun terminate() {
         audioTrack.stop()
     }
 
-    suspend fun play(audioData: AudioData) {
-        val audio = audioData.audio
+    suspend fun play(audio: FloatArray) {
         try {
             var index = 0
             while (index < audio.size && currentCoroutineContext().isActive) {

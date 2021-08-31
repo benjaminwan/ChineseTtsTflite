@@ -1,8 +1,9 @@
-package com.benjaminwan.chinesettstflite
+package com.benjaminwan.chinesettstflite.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import com.benjaminwan.chinesettstflite.ui.speech.SpeechScreen
 import com.benjaminwan.chinesettstflite.ui.theme.ChineseTtsTfliteTheme
 
 class MainActivity : ComponentActivity() {
+    private val mainVM: MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         TtsManager.initModels(this)
@@ -29,7 +31,7 @@ class MainActivity : ComponentActivity() {
                         bottomBar = {},
                     ) { innerPadding ->
                         Box(modifier = Modifier.padding(innerPadding)) {
-                            SpeechScreen()
+                            SpeechScreen(mainVM)
                         }
                     }
                 }

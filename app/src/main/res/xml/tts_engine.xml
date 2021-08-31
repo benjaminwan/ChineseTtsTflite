@@ -14,4 +14,4 @@
      limitations under the License.
 -->
 <tts-engine xmlns:android="http://schemas.android.com/apk/res/android"
-  android:settingsActivity="com.benjaminwan.chinesettstflite.MainActivity" />
+  android:settingsActivity="com.benjaminwan.chinesettstflite.ui.MainActivity" />

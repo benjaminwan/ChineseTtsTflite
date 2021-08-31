@@ -5,19 +5,20 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.benjaminwan.chinesettstflite.models.AudioData
+import com.benjaminwan.chinesettstflite.models.SpeechPosInfo
 import com.benjaminwan.chinesettstflite.models.TtsType
 import com.benjaminwan.chinesettstflite.tts.TtsManager
+import com.benjaminwan.chinesettstflite.ui.MainViewModel
 
 @Composable
-fun SpeechScreen() {
+fun SpeechScreen(mainVM: MainViewModel) {
     var speechText by remember { mutableStateOf("时间就像海绵里的水，只要愿挤，总还是有的。其实地上本没有路，走的人多了，也便成了路。") }
     val ttsType by TtsManager.ttsTypeState
     val speed by TtsManager.speedState
     val speedEnable = ttsType == TtsType.FASTSPEECH2
     val ttsReady by TtsManager.ttsReadyState
     val ttsState by TtsManager.ttsState
-    val currentSpeech by TtsManager.currentSpeechState
+    val currentSpeech by TtsManager.speechPosState
     Column {
         OutlinedTextField(
             value = speechText,
@@ -86,7 +87,7 @@ fun SpeechScreen() {
                 .padding(4.dp, 4.dp), horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
-                onClick = { TtsManager.input(speechText) },
+                onClick = { TtsManager.speech(speechText) },
                 enabled = ttsReady && ttsState.isStop
             ) {
                 Text(text = "开始")
@@ -98,7 +99,7 @@ fun SpeechScreen() {
                 Text(text = "停止")
             }
         }
-        if (ttsState.isStart && currentSpeech != AudioData.emptyAudioData) {
+        if (ttsState.isStart && currentSpeech != SpeechPosInfo.emptyAudioData) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

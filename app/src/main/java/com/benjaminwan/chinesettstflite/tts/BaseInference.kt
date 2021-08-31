@@ -19,7 +19,7 @@ abstract class BaseInference(val file: File) {
                 } dataType=${tensor.dataType()}"
             )
         }
-        Logger.i(inputTensorInfo.toString())
+        //Logger.i(inputTensorInfo.toString())
         val outputCount = interpreter.outputTensorCount
         val outputTensorInfo = StringBuilder().appendLine(file.name)
         (0 until outputCount).forEach {
@@ -30,6 +30,6 @@ abstract class BaseInference(val file: File) {
                 } dataType=${tensor.dataType()}"
             )
         }
-        Logger.i(outputTensorInfo.toString())
+        //Logger.i(outputTensorInfo.toString())
     }
 }

@@ -1,10 +1,12 @@
 package com.benjaminwan.chinesettstflite.tts
 
 import android.content.Context
+import android.media.AudioFormat
+import android.speech.tts.SynthesisCallback
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import com.benjaminwan.chinesettstflite.models.AudioData
-import com.benjaminwan.chinesettstflite.models.AudioData.Companion.emptyAudioData
+import com.benjaminwan.chinesettstflite.models.SpeechPosInfo
+import com.benjaminwan.chinesettstflite.models.SpeechPosInfo.Companion.emptyAudioData
 import com.benjaminwan.chinesettstflite.models.TtsState
 import com.benjaminwan.chinesettstflite.models.TtsType
 import com.benjaminwan.chinesettstflite.utils.ZhProcessor
@@ -13,8 +15,13 @@ import com.orhanobut.logger.Logger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 object TtsManager {
+    const val TTS_SAMPLE_RATE = 24000
+    const val TTS_AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
+
     private const val FASTSPEECH2 = "fastspeech2_quan.tflite"
     private const val TACOTRON2 = "tacotron2_quan.tflite"
     private const val MELGAN = "mb_melgan.tflite"
@@ -28,7 +35,7 @@ object TtsManager {
     private lateinit var zhProcessor: ZhProcessor
 
     val ttsReadyState: MutableState<Boolean> = mutableStateOf(false)
-    private var ttsReady: Boolean
+    var ttsReady: Boolean
         get() = ttsReadyState.value
         set(value) {
             ttsReadyState.value = value
@@ -48,12 +55,18 @@ object TtsManager {
             ttsTypeState.value = value
         }
 
-    val currentSpeechState: MutableState<AudioData> = mutableStateOf(emptyAudioData)
-    var currentSpeech: AudioData
-        get() = currentSpeechState.value
+    val speechPosState: MutableState<SpeechPosInfo> = mutableStateOf(emptyAudioData)
+    var speechPos: SpeechPosInfo
+        get() = speechPosState.value
         set(value) {
-            currentSpeechState.value = value
+            speechPosState.value = value
         }
+
+    private var onSpeechDataListenerListener: OnSpeechDataListener? = null
+
+    fun setOnSpeechDataListener(listener: OnSpeechDataListener?) {
+        onSpeechDataListenerListener = listener
+    }
 
     fun initModels(context: Context) {
         zhProcessor = ZhProcessor(context)
@@ -71,7 +84,41 @@ object TtsManager {
         ttsReady = true
     }
 
-    private suspend fun sentenceToSpeech(sentence: String, max: Int, current: Int) {
+    fun stop() {
+        inputTextJob?.cancel()
+        ttsState.value = TtsState(isStart = false)
+    }
+
+    fun speech(inputText: String, callback: SynthesisCallback? = null) {
+        inputTextJob = flow {
+            emit(inputText)
+        }.flowOn(Dispatchers.IO)
+            .catch { error -> error.printStackTrace() }
+            .onStart {
+                ttsState.value = TtsState(isStart = true)
+                callback?.start(TTS_SAMPLE_RATE, TTS_AUDIO_FORMAT, 1)
+                Logger.i("onStart")
+            }
+            .onEach { input ->
+                val regex = Regex("[\n，。？?！!,;；]")
+                val sentences = input.split(regex).filter { it.isNotBlank() }
+                val size = sentences.size
+                sentences.forEachIndexed { index, s ->
+                    if (currentCoroutineContext().isActive) {
+                        sentenceToSpeech(s, size, index + 1, callback)
+                    }
+                }
+            }
+            .onCompletion {
+                ttsState.value = TtsState(isStart = false)
+                speechPos = emptyAudioData
+                callback?.done()
+                Logger.i("onCompletion")
+            }
+            .launchIn(scope)
+    }
+
+    private suspend fun sentenceToSpeech(sentence: String, max: Int, current: Int, callback: SynthesisCallback?) {
         Logger.i("sentence=$sentence")
         val startTime = System.currentTimeMillis()
         val inputIds: IntArray = zhProcessor.text2ids(sentence)
@@ -90,39 +137,41 @@ object TtsManager {
             }
             val vocoderTime = System.currentTimeMillis()
             if (audioArray != null) {
-                val audioData = AudioData(sentence, audioArray, max, current)
-                currentSpeech = audioData
-                AudioPlayer.play(audioData)
+                speechPos = SpeechPosInfo(sentence, max, current)
+                if (callback != null) {
+                    writeToCallBack(callback, audioArray)
+                }
+                onSpeechDataListenerListener?.invoke(audioArray)
             }
             Logger.i("Vocoder Time cost=${vocoderTime - encoderTime}")
         }
     }
 
-    fun stop() {
-        inputTextJob?.cancel()
-        ttsState.value = TtsState(isStart = false)
+    private suspend fun writeToCallBack(callback: SynthesisCallback, audioFloat: FloatArray) {
+        val audio = audioFloat.toByteArray()
+        Logger.i("writeToCallBack:Float(${audioFloat.size}) Byte(${audio.size})")
+        try {
+            val maxBufferSize: Int = callback.maxBufferSize
+            var offset = 0
+            while (offset < audio.size && currentCoroutineContext().isActive) {
+                val bytesToWrite = Math.min(maxBufferSize, audio.size - offset)
+                callback.audioAvailable(audio, offset, bytesToWrite)
+                offset += bytesToWrite
+            }
+        } catch (e: Exception) {
+            Logger.e("Exception: $e")
+        }
     }
 
-    fun input(inputText: String) {
-        inputTextJob = flow {
-            emit(inputText)
-        }.flowOn(Dispatchers.IO)
-            .catch { error -> error.printStackTrace() }
-            .onStart { ttsState.value = TtsState(isStart = true) }
-            .onEach { input ->
-                val regex = Regex("[\n，。？?！!,;；]")
-                val sentences = input.split(regex).filter { it.isNotBlank() }
-                val size = sentences.size
-                sentences.forEachIndexed { index, s ->
-                    if (currentCoroutineContext().isActive) {
-                        sentenceToSpeech(s, size, index + 1)
-                    }
-                }
-            }
-            .onCompletion {
-                ttsState.value = TtsState(isStart = false)
-                currentSpeech = emptyAudioData
-            }
-            .launchIn(scope)
+    private fun FloatArray.toByteArray(): ByteArray {
+        val shortArray = ShortArray(this.size)
+        this.forEachIndexed { index, f ->
+            shortArray[index] = (f * 32768F).toInt().toShort()
+        }
+        val buffer = ByteBuffer.allocate(4 * this.size)
+        buffer.order(ByteOrder.LITTLE_ENDIAN)
+        buffer.asShortBuffer().put(shortArray)
+        return buffer.array()
     }
+
 }
