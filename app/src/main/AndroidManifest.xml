@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.benjaminwan.compose.chinesettstflite">
+    package="com.benjaminwan.chinesettstflite">
 
     <application
         android:name=".app.App"
@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ChineseTtsTflite">
         <activity
-            android:name=".MainActivity"
+            android:name="com.benjaminwan.chinesettstflite.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.ChineseTtsTflite.NoActionBar">
@@ -21,6 +21,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".service.TtsService"
+            android:label="@string/app_name"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.TTS_SERVICE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.speech.tts"
+                android:resource="@xml/tts_engine" />
+        </service>
     </application>
 
 </manifest>

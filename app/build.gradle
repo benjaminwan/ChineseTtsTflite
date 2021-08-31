@@ -20,7 +20,7 @@ android {
     compileSdk 31
 
     defaultConfig {
-        applicationId "com.benjaminwan.compose.chinesettstflite"
+        applicationId "com.benjaminwan.chinesettstflite"
         minSdk 21
         targetSdk 31
         versionCode 1
