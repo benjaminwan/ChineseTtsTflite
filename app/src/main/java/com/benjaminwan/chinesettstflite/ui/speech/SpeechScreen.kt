@@ -4,15 +4,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.benjaminwan.chinesettstflite.models.SpeechPosInfo
 import com.benjaminwan.chinesettstflite.models.TtsType
 import com.benjaminwan.chinesettstflite.tts.TtsManager
 import com.benjaminwan.chinesettstflite.ui.MainViewModel
+import com.benjaminwan.chinesettstflite.utils.gotoTtsSetting
 
 @Composable
 fun SpeechScreen(mainVM: MainViewModel) {
-    var speechText by remember { mutableStateOf("时间就像海绵里的水，只要愿挤，总还是有的。其实地上本没有路，走的人多了，也便成了路。") }
+    var speechText by remember { mutableStateOf("其实地上本没有路，走的人多了，也便成了路。") }
     val ttsType by TtsManager.ttsTypeState
     val speed by TtsManager.speedState
     val speedEnable = ttsType == TtsType.FASTSPEECH2
@@ -86,6 +88,10 @@ fun SpeechScreen(mainVM: MainViewModel) {
                 .fillMaxWidth()
                 .padding(4.dp, 4.dp), horizontalArrangement = Arrangement.SpaceEvenly
         ) {
+            val context = LocalContext.current
+            Button(onClick = { context.gotoTtsSetting() }) {
+                Text(text = "设置TTS")
+            }
             Button(
                 onClick = { TtsManager.speech(speechText) },
                 enabled = ttsReady && ttsState.isStop
