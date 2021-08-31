@@ -16,7 +16,7 @@ import com.benjaminwan.chinesettstflite.utils.gotoTtsSetting
 fun SpeechScreen(mainVM: MainViewModel) {
     var speechText by remember { mutableStateOf("其实地上本没有路，走的人多了，也便成了路。") }
     val ttsType by TtsManager.ttsTypeState
-    val speed by TtsManager.speedState
+    val speed by TtsManager.ttsSpeedState
     val speedEnable = ttsType == TtsType.FASTSPEECH2
     val ttsReady by TtsManager.ttsReadyState
     val ttsState by TtsManager.ttsState
@@ -61,7 +61,7 @@ fun SpeechScreen(mainVM: MainViewModel) {
             Row {
                 RadioButton(
                     selected = speed == 1.2f,
-                    onClick = { TtsManager.speed = 1.2f },
+                    onClick = { TtsManager.ttsSpeed = 1.2f },
                     enabled = speedEnable && ttsReady
                 )
                 Text(text = "慢")
@@ -69,7 +69,7 @@ fun SpeechScreen(mainVM: MainViewModel) {
             Row {
                 RadioButton(
                     selected = speed == 1.0f,
-                    onClick = { TtsManager.speed = 1.0f },
+                    onClick = { TtsManager.ttsSpeed = 1.0f },
                     enabled = speedEnable && ttsReady
                 )
                 Text(text = "普通")
@@ -77,7 +77,7 @@ fun SpeechScreen(mainVM: MainViewModel) {
             Row {
                 RadioButton(
                     selected = speed == 0.8f,
-                    onClick = { TtsManager.speed = 0.8f },
+                    onClick = { TtsManager.ttsSpeed = 0.8f },
                     enabled = speedEnable && ttsReady
                 )
                 Text(text = "快")

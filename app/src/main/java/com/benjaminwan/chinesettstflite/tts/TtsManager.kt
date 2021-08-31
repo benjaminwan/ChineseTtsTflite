@@ -5,12 +5,14 @@ import android.media.AudioFormat
 import android.speech.tts.SynthesisCallback
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import com.benjaminwan.chinesettstflite.app.App
 import com.benjaminwan.chinesettstflite.models.SpeechPosInfo
 import com.benjaminwan.chinesettstflite.models.SpeechPosInfo.Companion.emptyAudioData
 import com.benjaminwan.chinesettstflite.models.TtsState
 import com.benjaminwan.chinesettstflite.models.TtsType
 import com.benjaminwan.chinesettstflite.utils.ZhProcessor
 import com.benjaminwan.chinesettstflite.utils.copyAssetFileToDir
+import com.benjaminwan.moshi.utils.moshiAny
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -19,8 +21,12 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 object TtsManager {
-    const val TTS_SAMPLE_RATE = 24000
-    const val TTS_AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
+    private const val SP_APP = "sp_tts_app"
+    private const val SP_TTS_TYPE = "sp_tts_type"
+    private const val SP_TTS_SPEED = "sp_tts_speed"
+
+    private const val TTS_SAMPLE_RATE = 24000
+    private const val TTS_AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
 
     private const val FASTSPEECH2 = "fastspeech2_quan.tflite"
     private const val TACOTRON2 = "tacotron2_quan.tflite"
@@ -42,17 +48,21 @@ object TtsManager {
         }
 
     val ttsState: MutableState<TtsState> = mutableStateOf(TtsState())
-    val speedState: MutableState<Float> = mutableStateOf(1.0f)
-    var speed: Float
-        get() = speedState.value
+
+    val ttsSpeedState: MutableState<Float> = mutableStateOf(1.0f)
+    var ttsSpeed: Float
+        get() = ttsSpeedState.value
         set(value) {
-            speedState.value = value
+            ttsSpeedState.value = value
+            spTtsSpeed = value
         }
+
     val ttsTypeState: MutableState<TtsType> = mutableStateOf(TtsType.FASTSPEECH2)
     var ttsType: TtsType
         get() = ttsTypeState.value
         set(value) {
             ttsTypeState.value = value
+            spTtsType = value
         }
 
     val speechPosState: MutableState<SpeechPosInfo> = mutableStateOf(emptyAudioData)
@@ -66,6 +76,19 @@ object TtsManager {
 
     fun setOnSpeechDataListener(listener: OnSpeechDataListener?) {
         onSpeechDataListenerListener = listener
+    }
+
+    private var spTtsType: TtsType by App.INSTANCE
+        .getSharedPreferences(SP_APP, Context.MODE_PRIVATE)
+        .moshiAny(SP_TTS_TYPE, TtsType.FASTSPEECH2)
+
+    private var spTtsSpeed: Float by App.INSTANCE
+        .getSharedPreferences(SP_APP, Context.MODE_PRIVATE)
+        .moshiAny(SP_TTS_SPEED, 1.0f)
+
+    init {
+        ttsType = spTtsType
+        ttsSpeed = spTtsSpeed
     }
 
     fun initModels(context: Context) {
@@ -123,7 +146,7 @@ object TtsManager {
         val startTime = System.currentTimeMillis()
         val inputIds: IntArray = zhProcessor.text2ids(sentence)
         val tensorOutput: TensorBuffer? = when (ttsType) {
-            TtsType.FASTSPEECH2 -> fastSpeech?.getMelSpectrogram(inputIds, speed)
+            TtsType.FASTSPEECH2 -> fastSpeech?.getMelSpectrogram(inputIds, ttsSpeed)
             TtsType.TACOTRON2 -> tacotron?.getMelSpectrogram(inputIds)
         }
         val encoderTime = System.currentTimeMillis()
