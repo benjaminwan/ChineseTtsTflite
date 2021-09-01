@@ -6,12 +6,18 @@
 2. 从下面的模型下载地址，下载models-tflite.7z，把如下4个文件解压到对应目录
 
 ```
-├─app/src/main/assets/assets
+├─app/src/main/assets
 │      baker_mapper.json
 │      fastspeech2_quan.tflite
 │      mb_melgan.tflite
 │      tacotron2_quan.tflite
    ```
+
+3. 编译
+
+```shell
+./gradlew assembleRelease
+```
 
 ### 模型下载
 
@@ -27,8 +33,12 @@
 ### 参考资料
 
 [tensorflow指南](https://www.tensorflow.org/lite/guide/android)
+
 [参考tf测试](https://colab.research.google.com/drive/1YpSHRBRPBI7cnTkQn1UcVTWEQVbsUm1S?usp=sharing)
+
 [参考tflite转换](https://colab.research.google.com/drive/1Ma3MIcSdLsOxqOKcN1MlElncYMhrOg3J?usp=sharing)
+
+[Google Pico TTS Source](https://android.googlesource.com/platform/external/svox/)
 
 ### 环境配置
 
