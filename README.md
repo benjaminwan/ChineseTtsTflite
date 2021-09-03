@@ -1,4 +1,6 @@
 # Chinese TTS TF Lite
+[![Issue](https://img.shields.io/github/issues/benjaminwan/ChineseTtsTflite.svg)](https://github.com/benjaminwan/ChineseTtsTflite/issues)
+[![Star](https://img.shields.io/github/stars/benjaminwan/ChineseTtsTflite.svg)](https://github.com/benjaminwan/ChineseTtsTflite)
 
 ### 手动编译说明
 
