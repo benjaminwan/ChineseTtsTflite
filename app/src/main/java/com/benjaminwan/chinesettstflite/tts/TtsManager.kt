@@ -6,6 +6,9 @@ import android.speech.tts.SynthesisCallback
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.benjaminwan.chinesettstflite.app.App
+import com.benjaminwan.chinesettstflite.common.FASTSPEECH2_NAME
+import com.benjaminwan.chinesettstflite.common.MELGAN_NAME
+import com.benjaminwan.chinesettstflite.common.TACOTRON2_NAME
 import com.benjaminwan.chinesettstflite.models.SpeechPosInfo
 import com.benjaminwan.chinesettstflite.models.SpeechPosInfo.Companion.emptyAudioData
 import com.benjaminwan.chinesettstflite.models.TtsState
@@ -27,10 +30,6 @@ object TtsManager {
 
     private const val TTS_SAMPLE_RATE = 24000
     private const val TTS_AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
-
-    private const val FASTSPEECH2 = "fastspeech2_quan.tflite"
-    private const val TACOTRON2 = "tacotron2_quan.tflite"
-    private const val MELGAN = "mb_melgan.tflite"
 
     private var fastSpeech: FastSpeech2? = null
     private var tacotron: Tacotron2? = null
@@ -93,9 +92,9 @@ object TtsManager {
 
     fun initModels(context: Context) {
         zhProcessor = ZhProcessor(context)
-        val fastspeechFile = copyAssetFileToDir(context, FASTSPEECH2, context.filesDir.absolutePath)
-        val tacotronFile = copyAssetFileToDir(context, TACOTRON2, context.filesDir.absolutePath)
-        val vocoderFile = copyAssetFileToDir(context, MELGAN, context.filesDir.absolutePath)
+        val fastspeechFile = copyAssetFileToDir(context, FASTSPEECH2_NAME, context.filesDir.absolutePath)
+        val tacotronFile = copyAssetFileToDir(context, TACOTRON2_NAME, context.filesDir.absolutePath)
+        val vocoderFile = copyAssetFileToDir(context, MELGAN_NAME, context.filesDir.absolutePath)
         if (fastspeechFile == null || tacotronFile == null || vocoderFile == null) {
             Logger.e("TtsManager初始化失败:模型文件复制错误!")
             ttsReady = false

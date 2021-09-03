@@ -7,10 +7,11 @@ import android.speech.tts.TextToSpeechService
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.benjaminwan.chinesettstflite.tts.TtsManager
+import com.orhanobut.logger.Logger
 import java.util.*
 
 class TtsService : TextToSpeechService() {
-    private val currentLanguage: MutableState<Array<String>> = mutableStateOf(emptyArray())
+    private val currentLanguage: MutableState<Array<String>> = mutableStateOf(arrayOf("zho", "CHN", "fastspeech"))
 
     override fun onIsLanguageAvailable(_lang: String?, _country: String?, _variant: String?): Int {
         val lang = _lang ?: ""
@@ -22,6 +23,7 @@ class TtsService : TextToSpeechService() {
     }
 
     override fun onGetLanguage(): Array<String> {
+        Logger.i("onGetLanguage: ${currentLanguage.value}")
         return currentLanguage.value
     }
 
@@ -29,6 +31,7 @@ class TtsService : TextToSpeechService() {
         val lang = _lang ?: ""
         val country = _country ?: ""
         val variant = _variant ?: ""
+        Logger.i("$lang, $country, $variant")
         val result = onIsLanguageAvailable(lang, country, variant)
         currentLanguage.value = arrayOf<String>(lang, country, variant)
         return result
