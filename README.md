@@ -1,6 +1,21 @@
 # Chinese TTS TF Lite
+
 [![Issue](https://img.shields.io/github/issues/benjaminwan/ChineseTtsTflite.svg)](https://github.com/benjaminwan/ChineseTtsTflite/issues)
 [![Star](https://img.shields.io/github/stars/benjaminwan/ChineseTtsTflite.svg)](https://github.com/benjaminwan/ChineseTtsTflite)
+
+### 介绍
+
+使用Kotlin + JetPack Compose + Tensorflow Lite开发的TTS引擎，可以完全离线使用。
+
+可选两种模型：FastSpeech和Tacotron，这两种模型均来自[TensorFlowTTS](https://github.com/TensorSpeech/TensorFlowTTS)
+
+文字转拼音方法来自：[TensorflowTTS_chinese](https://github.com/tatans-coder/TensorflowTTS_chinese)
+
+因为是实时推理输出音频，故对设备性能有一定要求。
+
+其中FastSpeech速度较快，但生成的音频拟人效果较差，可以用于普通中端以上手机。
+
+而Tacotron对性能要求较高，虽然总体效果更好，但因为速度很慢，故目前实用价值不大，仅供测试。
 
 ### 手动编译说明
 
@@ -76,4 +91,5 @@ $ python convert-tflite.py
 ```
 
 ### APP界面截图
+
 ![avatar](capture/sample.png)
