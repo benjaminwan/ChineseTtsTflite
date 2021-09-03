@@ -31,7 +31,7 @@ class FastSpeech2(file: File) : BaseInference(file) {
             arrayOf<Any>(inputs, intArrayOf(0), floatArrayOf(speed), floatArrayOf(1f), floatArrayOf(1f)),
             outputMap
         )
-        Logger.i("time cost: ${System.currentTimeMillis() - startTime}")
+        //Logger.i("time cost: ${System.currentTimeMillis() - startTime}")
         val size: Int = interpreter.getOutputTensor(0).shape()[2]
         val shape = intArrayOf(1, outputBuffer.position() / size, size)
         val spectrogram = TensorBuffer.createFixedSize(shape, DataType.FLOAT32)

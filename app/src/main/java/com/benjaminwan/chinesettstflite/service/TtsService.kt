@@ -1,6 +1,9 @@
 package com.benjaminwan.chinesettstflite.service
 
-import android.speech.tts.*
+import android.speech.tts.SynthesisCallback
+import android.speech.tts.SynthesisRequest
+import android.speech.tts.TextToSpeech
+import android.speech.tts.TextToSpeechService
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.benjaminwan.chinesettstflite.tts.TtsManager
@@ -40,7 +43,12 @@ class TtsService : TextToSpeechService() {
 
     override fun onSynthesizeText(request: SynthesisRequest?, callback: SynthesisCallback?) {
         if (request == null || callback == null) return
-        val load = onLoadLanguage(request.language, request.country, request.variant)
+        val language = request.language
+        val country = request.country
+        val variant = request.variant
+        val text = request.charSequenceText.toString()
+
+        val load = onIsLanguageAvailable(language, country, variant)
         if (load == TextToSpeech.LANG_NOT_SUPPORTED) {
             callback.error()
             return
@@ -49,7 +57,7 @@ class TtsService : TextToSpeechService() {
             callback.error()
             return
         }
-        val text = request.charSequenceText.toString()
-        TtsManager.speech(text, callback)
+        Logger.i("text=$text")
+        TtsManager.speechAsync(text, callback)
     }
 }

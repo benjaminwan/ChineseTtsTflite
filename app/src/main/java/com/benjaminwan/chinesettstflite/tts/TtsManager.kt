@@ -29,8 +29,8 @@ object TtsManager {
     private const val SP_TTS_TYPE = "sp_tts_type"
     private const val SP_TTS_SPEED = "sp_tts_speed"
 
-    private const val TTS_SAMPLE_RATE = 24000
-    private const val TTS_AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
+    const val TTS_SAMPLE_RATE = 24000
+    const val TTS_AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
 
     private var fastSpeech: FastSpeech2? = null
     private var tacotron: Tacotron2? = null
@@ -112,6 +112,52 @@ object TtsManager {
         ttsState.value = TtsState(isStart = false)
     }
 
+    fun speechAsync(inputText: String, callback: SynthesisCallback) = runBlocking(Dispatchers.IO) {
+        callback.start(TTS_SAMPLE_RATE, TTS_AUDIO_FORMAT, 1)
+        if (inputText.isBlank()) {
+            callback.done()
+            return@runBlocking
+        }
+        val regex = Regex("[\n，。？?！!,;；]")
+        val sentences = inputText.split(regex).filter { it.isNotBlank() }
+        inputTextJob = scope.launch {
+            sentences.map {
+                sentenceToData(it)
+            }.forEach { audio ->
+                if (audio != null) {
+                    writeToCallBack(callback, audio)
+                }
+            }
+
+        }
+        inputTextJob?.join()
+        callback.done()
+    }
+
+    private fun sentenceToData(sentence: String): FloatArray? {
+        Logger.i("sentence=$sentence")
+        val startTime = System.currentTimeMillis()
+        val inputIds: IntArray = zhProcessor.text2ids(sentence)
+        val tensorOutput: TensorBuffer? = when (ttsType) {
+            TtsType.FASTSPEECH2 -> fastSpeech?.getMelSpectrogram(inputIds, ttsSpeed)
+            TtsType.TACOTRON2 -> tacotron?.getMelSpectrogram(inputIds)
+        }
+        val encoderTime = System.currentTimeMillis()
+        //Logger.i("Encoder Time cost=${encoderTime - startTime}")
+        if (tensorOutput != null) {
+            val audioArray: FloatArray? = try {
+                melGan?.getAudio(tensorOutput)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+            val vocoderTime = System.currentTimeMillis()
+            return audioArray
+            //Logger.i("Vocoder Time cost=${vocoderTime - encoderTime}")
+        }
+        return null
+    }
+
     fun speech(inputText: String, callback: SynthesisCallback? = null) {
         inputTextJob = flow {
             emit(inputText)
@@ -119,7 +165,7 @@ object TtsManager {
             .catch { error -> error.printStackTrace() }
             .onStart {
                 ttsState.value = TtsState(isStart = true)
-                callback?.start(TTS_SAMPLE_RATE, TTS_AUDIO_FORMAT, 1)
+                //callback?.start(TTS_SAMPLE_RATE, TTS_AUDIO_FORMAT, 1)
                 Logger.i("onStart")
             }
             .onEach { input ->
@@ -150,7 +196,7 @@ object TtsManager {
             TtsType.TACOTRON2 -> tacotron?.getMelSpectrogram(inputIds)
         }
         val encoderTime = System.currentTimeMillis()
-        Logger.i("Encoder Time cost=${encoderTime - startTime}")
+        //Logger.i("Encoder Time cost=${encoderTime - startTime}")
         if (tensorOutput != null) {
             val audioArray: FloatArray? = try {
                 melGan?.getAudio(tensorOutput)
@@ -164,15 +210,15 @@ object TtsManager {
                 if (callback != null) {
                     writeToCallBack(callback, audioArray)
                 }
-                onSpeechDataListenerListener?.invoke(audioArray)
+                //onSpeechDataListenerListener?.invoke(audioArray)
             }
-            Logger.i("Vocoder Time cost=${vocoderTime - encoderTime}")
+            //Logger.i("Vocoder Time cost=${vocoderTime - encoderTime}")
         }
     }
 
     private suspend fun writeToCallBack(callback: SynthesisCallback, audioFloat: FloatArray) {
         val audio = audioFloat.toByteArray()
-        Logger.i("writeToCallBack:Float(${audioFloat.size}) Byte(${audio.size})")
+        //Logger.i("writeToCallBack:Float(${audioFloat.size}) Byte(${audio.size})")
         try {
             val maxBufferSize: Int = callback.maxBufferSize
             var offset = 0
