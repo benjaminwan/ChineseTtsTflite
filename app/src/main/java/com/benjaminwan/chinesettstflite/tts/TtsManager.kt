@@ -9,6 +9,7 @@ import com.benjaminwan.chinesettstflite.app.App
 import com.benjaminwan.chinesettstflite.common.FASTSPEECH2_NAME
 import com.benjaminwan.chinesettstflite.common.MELGAN_NAME
 import com.benjaminwan.chinesettstflite.common.TACOTRON2_NAME
+import com.benjaminwan.chinesettstflite.common.targetDir
 import com.benjaminwan.chinesettstflite.models.SpeechPosInfo
 import com.benjaminwan.chinesettstflite.models.SpeechPosInfo.Companion.emptyAudioData
 import com.benjaminwan.chinesettstflite.models.TtsState
@@ -92,9 +93,9 @@ object TtsManager {
 
     fun initModels(context: Context) {
         zhProcessor = ZhProcessor(context)
-        val fastspeechFile = copyAssetFileToDir(context, FASTSPEECH2_NAME, context.filesDir.absolutePath)
-        val tacotronFile = copyAssetFileToDir(context, TACOTRON2_NAME, context.filesDir.absolutePath)
-        val vocoderFile = copyAssetFileToDir(context, MELGAN_NAME, context.filesDir.absolutePath)
+        val fastspeechFile = copyAssetFileToDir(context, FASTSPEECH2_NAME, targetDir)
+        val tacotronFile = copyAssetFileToDir(context, TACOTRON2_NAME, targetDir)
+        val vocoderFile = copyAssetFileToDir(context, MELGAN_NAME, targetDir)
         if (fastspeechFile == null || tacotronFile == null || vocoderFile == null) {
             Logger.e("TtsManager初始化失败:模型文件复制错误!")
             ttsReady = false

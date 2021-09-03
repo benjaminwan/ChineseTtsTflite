@@ -4,9 +4,11 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
-import com.benjaminwan.chinesettstflite.common.*
+import com.benjaminwan.chinesettstflite.common.fastspeechPath
+import com.benjaminwan.chinesettstflite.common.melganPath
+import com.benjaminwan.chinesettstflite.common.tacotronPath
+import com.benjaminwan.chinesettstflite.common.zhLanguage
 import com.benjaminwan.chinesettstflite.utils.FileUtils.isFileExists
-import java.io.File
 
 class CheckVoiceData : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,9 +19,9 @@ class CheckVoiceData : Activity() {
         val available: ArrayList<String> = arrayListOf()
         val unavailable: ArrayList<String> = arrayListOf()
 
-        val isFastSpeedExist = isFileExists(rootDir + File.separator + FASTSPEECH2_NAME)
-        val isTacotronExist = isFileExists(rootDir + File.separator + TACOTRON2_NAME)
-        val isMelganExist = isFileExists(rootDir + File.separator + MELGAN_NAME)
+        val isFastSpeedExist = isFileExists(fastspeechPath)
+        val isTacotronExist = isFileExists(tacotronPath)
+        val isMelganExist = isFileExists(melganPath)
 
         if ((isFastSpeedExist && isMelganExist) || (isTacotronExist && isMelganExist)) {
             available.add(zhLanguage)

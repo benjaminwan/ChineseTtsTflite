@@ -1,9 +1,6 @@
 package com.benjaminwan.chinesettstflite.service
 
-import android.speech.tts.SynthesisCallback
-import android.speech.tts.SynthesisRequest
-import android.speech.tts.TextToSpeech
-import android.speech.tts.TextToSpeechService
+import android.speech.tts.*
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.benjaminwan.chinesettstflite.tts.TtsManager
@@ -11,7 +8,7 @@ import com.orhanobut.logger.Logger
 import java.util.*
 
 class TtsService : TextToSpeechService() {
-    private val currentLanguage: MutableState<Array<String>> = mutableStateOf(arrayOf("zho", "CHN", "fastspeech"))
+    private val currentLanguage: MutableState<Array<String>> = mutableStateOf(arrayOf("zho", "CHN", ""))
 
     override fun onIsLanguageAvailable(_lang: String?, _country: String?, _variant: String?): Int {
         val lang = _lang ?: ""
@@ -54,17 +51,5 @@ class TtsService : TextToSpeechService() {
         }
         val text = request.charSequenceText.toString()
         TtsManager.speech(text, callback)
-    }
-
-    override fun onGetFeaturesForLanguage(lang: String?, country: String?, variant: String?): MutableSet<String> {
-        val hashSet = HashSet<String>()
-        hashSet.add(lang ?: "")
-        hashSet.add(country ?: "")
-        hashSet.add(variant ?: "")
-        return hashSet
-    }
-
-    override fun onLoadVoice(voiceName: String?): Int {
-        return TextToSpeech.SUCCESS
     }
 }
