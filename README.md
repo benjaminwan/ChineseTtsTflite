@@ -32,6 +32,10 @@
 
 ### 参考资料
 
+[TensorFlowTTS](https://github.com/TensorSpeech/TensorFlowTTS)
+
+[TensorflowTTS_chinese](https://github.com/tatans-coder/TensorflowTTS_chinese)
+
 [tensorflow指南](https://www.tensorflow.org/lite/guide/android)
 
 [参考tf测试](https://colab.research.google.com/drive/1YpSHRBRPBI7cnTkQn1UcVTWEQVbsUm1S?usp=sharing)
