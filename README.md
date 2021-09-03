@@ -1,8 +1,8 @@
 # Chinese TTS TF Lite
 
-### APP编译说明
+### 手动编译说明
 
-1. Android 2020.3.1
+1. Android 2020.3.1 Patch 2
 2. 从下面的模型下载地址，下载models-tflite.7z，把如下4个文件解压到对应目录
 
 ```
