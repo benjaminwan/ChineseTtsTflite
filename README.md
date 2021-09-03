@@ -68,3 +68,6 @@ $ python test-h5.py
 ```shell
 $ python convert-tflite.py
 ```
+
+### APP界面截图
+![avatar](capture/sample.png)
