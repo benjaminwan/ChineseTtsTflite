@@ -49,6 +49,17 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.GetSampleText"
+            android:exported="true"
+            android:label="GetSampleText"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+            <intent-filter>
+                <action android:name="android.speech.tts.engine.GET_SAMPLE_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name=".service.TtsService"
             android:exported="true"
