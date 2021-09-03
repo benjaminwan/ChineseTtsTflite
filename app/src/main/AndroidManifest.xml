@@ -27,7 +27,18 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <!--       检查语音文件。-->
+
+        <activity
+            android:name=".ui.DownloadVoiceData"
+            android:exported="true"
+            android:label="DownloadVoiceData">
+            <intent-filter>
+                <action android:name="android.speech.tts.engine.INSTALL_TTS_DATA" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".ui.CheckVoiceData"
             android:exported="true"
