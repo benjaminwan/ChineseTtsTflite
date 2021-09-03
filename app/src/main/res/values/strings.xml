@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">ChineseTtsTflite</string>
+    <string name="file_copy_error">TtsManager初始化失败:模型文件复制错误!</string>
     <string name="zho_sample">其实地上本没有路，走的人多了，也便成了路。</string>
+
+    <string name="tts_model_select">语音模型选择</string>
+    <string name="tts_speed_select">语速控制</string>
+    <string name="tts_speed_slow">慢</string>
+    <string name="tts_speed_mid">普通</string>
+    <string name="tts_speed_fast">快</string>
+
+    <string name="goto_tts_setting">去TTS设置</string>
+    <string name="start_speech">开始朗读</string>
+    <string name="stop_speech">停止朗读</string>
 </resources>

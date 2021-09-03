@@ -30,7 +30,7 @@ class Tacotron2(file: File) : BaseInference(file) {
             arrayOf<Any>(inputs, intArrayOf(inputIds.size), intArrayOf(0)),
             outputMap
         )
-        Logger.i("time cost: ${System.currentTimeMillis() - startTime}")
+        //Logger.i("time cost: ${System.currentTimeMillis() - startTime}")
 
         val size: Int = interpreter.getOutputTensor(0).shape()[2]
         val shape = intArrayOf(1, outputBuffer.position() / size, size)

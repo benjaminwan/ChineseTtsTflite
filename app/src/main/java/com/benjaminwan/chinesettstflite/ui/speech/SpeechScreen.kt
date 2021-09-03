@@ -1,12 +1,18 @@
 package com.benjaminwan.chinesettstflite.ui.speech
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Button
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.RadioButton
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.benjaminwan.chinesettstflite.models.SpeechPosInfo
+import com.benjaminwan.chinesettstflite.R
 import com.benjaminwan.chinesettstflite.models.TtsType
 import com.benjaminwan.chinesettstflite.tts.TtsManager
 import com.benjaminwan.chinesettstflite.ui.MainViewModel
@@ -14,13 +20,13 @@ import com.benjaminwan.chinesettstflite.utils.gotoTtsSetting
 
 @Composable
 fun SpeechScreen(mainVM: MainViewModel) {
-    var speechText by remember { mutableStateOf("其实地上本没有路，走的人多了，也便成了路。") }
-    val ttsType by TtsManager.ttsTypeState
-    val speed by TtsManager.ttsSpeedState
-    val speedEnable = ttsType == TtsType.FASTSPEECH2
-    val ttsReady by TtsManager.ttsReadyState
-    val ttsState by TtsManager.ttsState
-    val currentSpeech by TtsManager.speechPosState
+    val defText = stringResource(R.string.zho_sample)
+    var speechText by remember { mutableStateOf(defText) }
+    val type by TtsManager.typeState //模型选择
+    val speed by TtsManager.speedState //语速控制
+    val speedEnable = type == TtsType.FASTSPEECH2
+    val ttsReady by mainVM.ttsReadyState //tts初始化状态
+    val isSpeak by mainVM.speakState//是否正在朗读
     Column {
         OutlinedTextField(
             value = speechText,
@@ -32,24 +38,46 @@ fun SpeechScreen(mainVM: MainViewModel) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(4.dp), horizontalArrangement = Arrangement.SpaceBetween
+                .padding(4.dp, 4.dp), horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "语音模型选择:")
-            Row {
-                RadioButton(
-                    selected = ttsType == TtsType.FASTSPEECH2,
-                    onClick = { TtsManager.ttsType = TtsType.FASTSPEECH2 },
-                    enabled = ttsReady
-                )
-                Text(text = TtsType.FASTSPEECH2.name)
+            Text(text = stringResource(R.string.tts_model_select))
+        }
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .padding(4.dp)
+        ) {
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp)
+                        .clickable { TtsManager.type = TtsType.FASTSPEECH2 },
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = TtsType.FASTSPEECH2.name)
+                    RadioButton(
+                        selected = type == TtsType.FASTSPEECH2,
+                        onClick = { TtsManager.type = TtsType.FASTSPEECH2 },
+                        enabled = ttsReady
+                    )
+                }
             }
-            Row {
-                RadioButton(
-                    selected = ttsType == TtsType.TACOTRON2,
-                    onClick = { TtsManager.ttsType = TtsType.TACOTRON2 },
-                    enabled = ttsReady
-                )
-                Text(text = TtsType.TACOTRON2.name)
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp)
+                        .clickable { TtsManager.type = TtsType.TACOTRON2 },
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(text = TtsType.TACOTRON2.name)
+                    RadioButton(
+                        selected = type == TtsType.TACOTRON2,
+                        onClick = { TtsManager.type = TtsType.TACOTRON2 },
+                        enabled = ttsReady
+                    )
+                }
             }
         }
         Row(
@@ -57,30 +85,30 @@ fun SpeechScreen(mainVM: MainViewModel) {
                 .fillMaxWidth()
                 .padding(4.dp, 4.dp), horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "语速控制：")
+            Text(text = stringResource(R.string.tts_speed_select))
             Row {
                 RadioButton(
                     selected = speed == 1.2f,
-                    onClick = { TtsManager.ttsSpeed = 1.2f },
+                    onClick = { TtsManager.speed = 1.2f },
                     enabled = speedEnable && ttsReady
                 )
-                Text(text = "慢")
+                Text(text = stringResource(R.string.tts_speed_slow))
             }
             Row {
                 RadioButton(
                     selected = speed == 1.0f,
-                    onClick = { TtsManager.ttsSpeed = 1.0f },
+                    onClick = { TtsManager.speed = 1.0f },
                     enabled = speedEnable && ttsReady
                 )
-                Text(text = "普通")
+                Text(text = stringResource(R.string.tts_speed_mid))
             }
             Row {
                 RadioButton(
                     selected = speed == 0.8f,
-                    onClick = { TtsManager.ttsSpeed = 0.8f },
+                    onClick = { TtsManager.speed = 0.8f },
                     enabled = speedEnable && ttsReady
                 )
-                Text(text = "快")
+                Text(text = stringResource(R.string.tts_speed_fast))
             }
         }
         Row(
@@ -90,35 +118,19 @@ fun SpeechScreen(mainVM: MainViewModel) {
         ) {
             val context = LocalContext.current
             Button(onClick = { context.gotoTtsSetting() }) {
-                Text(text = "设置TTS")
+                Text(text = stringResource(R.string.goto_tts_setting))
             }
             Button(
-                onClick = { TtsManager.speech(speechText) },
-                enabled = ttsReady && ttsState.isStop
+                onClick = { mainVM.sayText(speechText) },
+                enabled = ttsReady && !isSpeak
             ) {
-                Text(text = "开始")
+                Text(text = stringResource(R.string.start_speech))
             }
             Button(
-                onClick = { TtsManager.stop() },
-                enabled = ttsReady && ttsState.isStart
+                onClick = { mainVM.stop() },
+                enabled = ttsReady && isSpeak
             ) {
-                Text(text = "停止")
-            }
-        }
-        if (ttsState.isStart && currentSpeech != SpeechPosInfo.emptyAudioData) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp, 4.dp), horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row {
-                    Text(text = "当前朗读: ")
-                    Text(text = currentSpeech.text, style = MaterialTheme.typography.body2)
-                }
-                Row {
-                    Text(text = "当前/总共: ")
-                    Text(text = "${currentSpeech.pos}/${currentSpeech.max}")
-                }
+                Text(text = stringResource(R.string.stop_speech))
             }
         }
     }

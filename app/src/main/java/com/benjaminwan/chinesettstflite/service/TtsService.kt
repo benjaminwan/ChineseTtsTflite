@@ -53,7 +53,7 @@ class TtsService : TextToSpeechService() {
             callback.error()
             return
         }
-        if (!TtsManager.ttsReady) {
+        if (!TtsManager.isReady) {
             callback.error()
             return
         }

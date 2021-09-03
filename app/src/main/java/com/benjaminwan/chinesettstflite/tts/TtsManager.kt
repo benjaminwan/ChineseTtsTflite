@@ -5,14 +5,12 @@ import android.media.AudioFormat
 import android.speech.tts.SynthesisCallback
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import com.benjaminwan.chinesettstflite.R
 import com.benjaminwan.chinesettstflite.app.App
 import com.benjaminwan.chinesettstflite.common.FASTSPEECH2_NAME
 import com.benjaminwan.chinesettstflite.common.MELGAN_NAME
 import com.benjaminwan.chinesettstflite.common.TACOTRON2_NAME
 import com.benjaminwan.chinesettstflite.common.targetDir
-import com.benjaminwan.chinesettstflite.models.SpeechPosInfo
-import com.benjaminwan.chinesettstflite.models.SpeechPosInfo.Companion.emptyAudioData
-import com.benjaminwan.chinesettstflite.models.TtsState
 import com.benjaminwan.chinesettstflite.models.TtsType
 import com.benjaminwan.chinesettstflite.utils.ZhProcessor
 import com.benjaminwan.chinesettstflite.utils.copyAssetFileToDir
@@ -29,8 +27,8 @@ object TtsManager {
     private const val SP_TTS_TYPE = "sp_tts_type"
     private const val SP_TTS_SPEED = "sp_tts_speed"
 
-    const val TTS_SAMPLE_RATE = 24000
-    const val TTS_AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
+    private const val TTS_SAMPLE_RATE = 24000
+    private const val TTS_AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT
 
     private var fastSpeech: FastSpeech2? = null
     private var tacotron: Tacotron2? = null
@@ -40,43 +38,28 @@ object TtsManager {
     private var inputTextJob: Job? = null
     private lateinit var zhProcessor: ZhProcessor
 
-    val ttsReadyState: MutableState<Boolean> = mutableStateOf(false)
-    var ttsReady: Boolean
-        get() = ttsReadyState.value
+    val readyState: MutableState<Boolean> = mutableStateOf(false)
+    var isReady: Boolean
+        get() = readyState.value
         set(value) {
-            ttsReadyState.value = value
+            readyState.value = value
         }
 
-    val ttsState: MutableState<TtsState> = mutableStateOf(TtsState())
-
-    val ttsSpeedState: MutableState<Float> = mutableStateOf(1.0f)
-    var ttsSpeed: Float
-        get() = ttsSpeedState.value
+    val speedState: MutableState<Float> = mutableStateOf(1.0f)
+    var speed: Float
+        get() = speedState.value
         set(value) {
-            ttsSpeedState.value = value
+            speedState.value = value
             spTtsSpeed = value
         }
 
-    val ttsTypeState: MutableState<TtsType> = mutableStateOf(TtsType.FASTSPEECH2)
-    var ttsType: TtsType
-        get() = ttsTypeState.value
+    val typeState: MutableState<TtsType> = mutableStateOf(TtsType.FASTSPEECH2)
+    var type: TtsType
+        get() = typeState.value
         set(value) {
-            ttsTypeState.value = value
+            typeState.value = value
             spTtsType = value
         }
-
-    val speechPosState: MutableState<SpeechPosInfo> = mutableStateOf(emptyAudioData)
-    var speechPos: SpeechPosInfo
-        get() = speechPosState.value
-        set(value) {
-            speechPosState.value = value
-        }
-
-    private var onSpeechDataListenerListener: OnSpeechDataListener? = null
-
-    fun setOnSpeechDataListener(listener: OnSpeechDataListener?) {
-        onSpeechDataListenerListener = listener
-    }
 
     private var spTtsType: TtsType by App.INSTANCE
         .getSharedPreferences(SP_APP, Context.MODE_PRIVATE)
@@ -87,8 +70,8 @@ object TtsManager {
         .moshiAny(SP_TTS_SPEED, 1.0f)
 
     init {
-        ttsType = spTtsType
-        ttsSpeed = spTtsSpeed
+        type = spTtsType
+        speed = spTtsSpeed
     }
 
     fun initModels(context: Context) {
@@ -97,19 +80,18 @@ object TtsManager {
         val tacotronFile = copyAssetFileToDir(context, TACOTRON2_NAME, targetDir)
         val vocoderFile = copyAssetFileToDir(context, MELGAN_NAME, targetDir)
         if (fastspeechFile == null || tacotronFile == null || vocoderFile == null) {
-            Logger.e("TtsManager初始化失败:模型文件复制错误!")
-            ttsReady = false
+            Logger.e(context.getString(R.string.file_copy_error))
+            isReady = false
             return
         }
         fastSpeech = FastSpeech2(fastspeechFile)
         tacotron = Tacotron2(tacotronFile)
         melGan = MBMelGan(vocoderFile)
-        ttsReady = true
+        isReady = true
     }
 
     fun stop() {
         inputTextJob?.cancel()
-        ttsState.value = TtsState(isStart = false)
     }
 
     fun speechAsync(inputText: String, callback: SynthesisCallback) = runBlocking(Dispatchers.IO) {
@@ -138,8 +120,8 @@ object TtsManager {
         Logger.i("sentence=$sentence")
         val startTime = System.currentTimeMillis()
         val inputIds: IntArray = zhProcessor.text2ids(sentence)
-        val tensorOutput: TensorBuffer? = when (ttsType) {
-            TtsType.FASTSPEECH2 -> fastSpeech?.getMelSpectrogram(inputIds, ttsSpeed)
+        val tensorOutput: TensorBuffer? = when (type) {
+            TtsType.FASTSPEECH2 -> fastSpeech?.getMelSpectrogram(inputIds, speed)
             TtsType.TACOTRON2 -> tacotron?.getMelSpectrogram(inputIds)
         }
         val encoderTime = System.currentTimeMillis()
@@ -156,64 +138,6 @@ object TtsManager {
             //Logger.i("Vocoder Time cost=${vocoderTime - encoderTime}")
         }
         return null
-    }
-
-    fun speech(inputText: String, callback: SynthesisCallback? = null) {
-        inputTextJob = flow {
-            emit(inputText)
-        }.flowOn(Dispatchers.IO)
-            .catch { error -> error.printStackTrace() }
-            .onStart {
-                ttsState.value = TtsState(isStart = true)
-                //callback?.start(TTS_SAMPLE_RATE, TTS_AUDIO_FORMAT, 1)
-                Logger.i("onStart")
-            }
-            .onEach { input ->
-                val regex = Regex("[\n，。？?！!,;；]")
-                val sentences = input.split(regex).filter { it.isNotBlank() }
-                val size = sentences.size
-                sentences.forEachIndexed { index, s ->
-                    if (currentCoroutineContext().isActive) {
-                        sentenceToSpeech(s, size, index + 1, callback)
-                    }
-                }
-            }
-            .onCompletion {
-                ttsState.value = TtsState(isStart = false)
-                speechPos = emptyAudioData
-                callback?.done()
-                Logger.i("onCompletion")
-            }
-            .launchIn(scope)
-    }
-
-    private suspend fun sentenceToSpeech(sentence: String, max: Int, current: Int, callback: SynthesisCallback?) {
-        Logger.i("sentence=$sentence")
-        val startTime = System.currentTimeMillis()
-        val inputIds: IntArray = zhProcessor.text2ids(sentence)
-        val tensorOutput: TensorBuffer? = when (ttsType) {
-            TtsType.FASTSPEECH2 -> fastSpeech?.getMelSpectrogram(inputIds, ttsSpeed)
-            TtsType.TACOTRON2 -> tacotron?.getMelSpectrogram(inputIds)
-        }
-        val encoderTime = System.currentTimeMillis()
-        //Logger.i("Encoder Time cost=${encoderTime - startTime}")
-        if (tensorOutput != null) {
-            val audioArray: FloatArray? = try {
-                melGan?.getAudio(tensorOutput)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-            val vocoderTime = System.currentTimeMillis()
-            if (audioArray != null) {
-                speechPos = SpeechPosInfo(sentence, max, current)
-                if (callback != null) {
-                    writeToCallBack(callback, audioArray)
-                }
-                //onSpeechDataListenerListener?.invoke(audioArray)
-            }
-            //Logger.i("Vocoder Time cost=${vocoderTime - encoderTime}")
-        }
     }
 
     private suspend fun writeToCallBack(callback: SynthesisCallback, audioFloat: FloatArray) {
