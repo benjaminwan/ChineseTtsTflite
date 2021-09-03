@@ -313,7 +313,7 @@ public class Processor {
 
     public int[] textToIds(String text) {
         List<Integer> sequence = new ArrayList<>();
-        while (text!= null && text.length() > 0) {
+        while (text != null && text.length() > 0) {
             Matcher m = CURLY_RE.matcher(text);
             if (!m.find()) {
                 sequence.addAll(symbolsToSequence(cleanTextForEnglish(text)));

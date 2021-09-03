@@ -19,7 +19,7 @@ class MBMelGan(file: File) : BaseInference(file) {
         val outputBuffer = FloatBuffer.allocate(350000)
         val startTime = System.currentTimeMillis()
         interpreter.run(input.buffer, outputBuffer)
-        //Logger.i("time cost: " + (System.currentTimeMillis() - startTime))
+        //Logger.i("MBMelGan time cost: " + (System.currentTimeMillis() - startTime))
         val audioArray = FloatArray(outputBuffer.position())
         outputBuffer.rewind()
         outputBuffer[audioArray]

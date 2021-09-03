@@ -6,7 +6,7 @@ import java.io.File
 
 abstract class BaseInference(val file: File) {
     abstract val interpreter: Interpreter
-    val options get() = Interpreter.Options().apply { setNumThreads(5) }
+    val options get() = Interpreter.Options().apply { setNumThreads(4) }
 
     fun printTensorInfo() {
         val inputCount = interpreter.inputTensorCount
