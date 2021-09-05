@@ -61,7 +61,9 @@
 
 [Google Pico TTS Source](https://android.googlesource.com/platform/external/svox/)
 
-### 环境配置
+### 模型测试&转换
+
+#### 转换环境配置
 
 - Ubuntu: 20.04 LTS
 - Python: 3.8
@@ -73,18 +75,16 @@ $ pip install .
 $ pip install git+https://github.com/repodiac/german_transliterate.git
 ```
 
-### 模型测试&转换
+#### 解压models-tf.7z
 
-解压models-tf.7z
-
-1. TF模型测试
+#### TF模型测试
 
 ```shell
 $ cd models-tf
 $ python test-h5.py
 ```
 
-2. TF模型转TFLite
+#### TF模型转TFLite
 
 ```shell
 $ python convert-tflite.py
