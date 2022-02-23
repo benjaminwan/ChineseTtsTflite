@@ -12,6 +12,7 @@ import com.benjaminwan.chinesettstflite.common.MELGAN_NAME
 import com.benjaminwan.chinesettstflite.common.TACOTRON2_NAME
 import com.benjaminwan.chinesettstflite.common.targetDir
 import com.benjaminwan.chinesettstflite.models.TtsType
+import com.benjaminwan.chinesettstflite.utils.FloatArrayToByteArrayUtils.convertTo16Bit
 import com.benjaminwan.chinesettstflite.utils.ZhProcessor
 import com.benjaminwan.chinesettstflite.utils.copyAssetFileToDir
 import com.benjaminwan.moshi.utils.moshiAny
@@ -141,7 +142,7 @@ object TtsManager {
     }
 
     private suspend fun writeToCallBack(callback: SynthesisCallback, audioFloat: FloatArray) {
-        val audio = audioFloat.toByteArray()
+        val audio = convertTo16Bit(audioFloat)
         //Logger.i("writeToCallBack:Float(${audioFloat.size}) Byte(${audio.size})")
         try {
             val maxBufferSize: Int = callback.maxBufferSize
