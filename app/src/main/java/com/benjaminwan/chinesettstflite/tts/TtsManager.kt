@@ -18,7 +18,6 @@ import com.benjaminwan.chinesettstflite.utils.copyAssetFileToDir
 import com.benjaminwan.moshi.utils.moshiAny
 import com.orhanobut.logger.Logger
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -36,7 +35,7 @@ object TtsManager {
     private var melGan: MBMelGan? = null
 
     private val scope = CoroutineScope(Dispatchers.IO)
-    private var inputTextJob: Job? = null
+    private var inputTextJob: Job? = null//在Main线程调用，避免线程同步问题
     private lateinit var zhProcessor: ZhProcessor
 
     val readyState: MutableState<Boolean> = mutableStateOf(false)
@@ -95,7 +94,7 @@ object TtsManager {
         inputTextJob?.cancel()
     }
 
-    fun speechAsync(inputText: String, callback: SynthesisCallback) = runBlocking(Dispatchers.IO) {
+    fun speechAsync(inputText: String, callback: SynthesisCallback) = runBlocking(Dispatchers.Main.immediate) {
         callback.start(TTS_SAMPLE_RATE, TTS_AUDIO_FORMAT, 1)
         if (inputText.isBlank()) {
             callback.done()
@@ -111,7 +110,6 @@ object TtsManager {
                     writeToCallBack(callback, audio)
                 }
             }
-
         }
         inputTextJob?.join()
         callback.done()
@@ -157,6 +155,7 @@ object TtsManager {
         }
     }
 
+    //转换效率低，弃用
     private fun FloatArray.toByteArray(): ByteArray {
         val shortArray = ShortArray(this.size)
         this.forEachIndexed { index, f ->
