@@ -57,6 +57,13 @@ class MainViewModel : ViewModel() {
             speakState.value = value
         }
 
+    val appVer: String = try {
+        App.INSTANCE.packageManager.getPackageInfo(App.INSTANCE.packageName, 0).versionName
+    } catch (e: Exception) {
+        e.printStackTrace()
+        ""
+    }
+
     init {
         tts.setOnUtteranceProgressListener(progressListener)
     }

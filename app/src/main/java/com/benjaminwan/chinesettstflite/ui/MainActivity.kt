@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
             ChineseTtsTfliteTheme {
                 Surface(color = MaterialTheme.colors.background) {
                     Scaffold(
-                        topBar = { MainTopAppBar() },
+                        topBar = { MainTopAppBar(mainVM.appVer) },
                         bottomBar = {},
                     ) { innerPadding ->
                         Box(modifier = Modifier.padding(innerPadding)) {
@@ -41,10 +41,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainTopAppBar() {
+fun MainTopAppBar(appVer: String) {
     TopAppBar(
         title = {
-            Text(text = stringResource(R.string.app_name), maxLines = 2)
+            Text(text = "${stringResource(R.string.app_name)} $appVer", maxLines = 2)
         },
         modifier = Modifier
             .requiredHeight(42.dp)
