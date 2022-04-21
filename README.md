@@ -19,7 +19,7 @@
 
 ### 手动编译说明
 
-1. Android 2021.1.1 Patch 1
+1. Android 2021.1.1 Patch 3
 2. 从下面的模型下载地址，下载models-tflite.7z，把如下4个文件解压到对应目录
 
 ```
@@ -46,6 +46,10 @@
 ### 模型查看
 
 [netron](https://github.com/lutzroeder/netron/releases)
+
+### 裁剪TensorFlow Lite
+
+[缩减 TensorFlow Lite 二进制文件大小](https://tensorflow.google.cn/lite/guide/reduce_binary_size?hl=zh-cn)
 
 ### 参考资料
 
