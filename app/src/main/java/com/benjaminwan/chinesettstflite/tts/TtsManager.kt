@@ -12,7 +12,6 @@ import com.benjaminwan.chinesettstflite.common.MELGAN_NAME
 import com.benjaminwan.chinesettstflite.common.TACOTRON2_NAME
 import com.benjaminwan.chinesettstflite.common.targetDir
 import com.benjaminwan.chinesettstflite.models.TtsType
-import com.benjaminwan.chinesettstflite.utils.FloatArrayToByteArrayUtils.convertTo16Bit
 import com.benjaminwan.chinesettstflite.utils.ZhProcessor
 import com.benjaminwan.chinesettstflite.utils.copyAssetFileToDir
 import com.benjaminwan.moshi.utils.moshiAny
@@ -165,6 +164,16 @@ object TtsManager {
         buffer.order(ByteOrder.LITTLE_ENDIAN)
         buffer.asShortBuffer().put(shortArray)
         return buffer.array()
+    }
+
+    private fun convertTo16Bit(data: FloatArray): ByteArray {
+        val byte16bit = ByteArray(data.size shl 1)
+        for (i in data.indices) {
+            val temp = (32768 * data[i]).toInt()
+            byte16bit[i * 2] = temp.toByte()
+            byte16bit[i * 2 + 1] = (temp shr 8).toByte()
+        }
+        return byte16bit
     }
 
 }
