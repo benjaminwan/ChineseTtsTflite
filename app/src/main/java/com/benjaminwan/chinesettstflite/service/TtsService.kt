@@ -4,14 +4,12 @@ import android.speech.tts.SynthesisCallback
 import android.speech.tts.SynthesisRequest
 import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeechService
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import com.benjaminwan.chinesettstflite.tts.TtsManager
 import com.orhanobut.logger.Logger
 import java.util.*
 
 class TtsService : TextToSpeechService() {
-    private val currentLanguage: MutableState<Array<String>> = mutableStateOf(arrayOf("zho", "CHN", ""))
+    private val currentLanguage: MutableList<String> = mutableListOf("zho", "CHN", "")
 
     override fun onIsLanguageAvailable(_lang: String?, _country: String?, _variant: String?): Int {
         val lang = _lang ?: ""
@@ -23,8 +21,8 @@ class TtsService : TextToSpeechService() {
     }
 
     override fun onGetLanguage(): Array<String> {
-        Logger.i("onGetLanguage: ${currentLanguage.value}")
-        return currentLanguage.value
+        Logger.i("onGetLanguage: ${currentLanguage.toTypedArray()}")
+        return currentLanguage.toTypedArray()
     }
 
     override fun onLoadLanguage(_lang: String?, _country: String?, _variant: String?): Int {
@@ -33,7 +31,8 @@ class TtsService : TextToSpeechService() {
         val variant = _variant ?: ""
         Logger.i("$lang, $country, $variant")
         val result = onIsLanguageAvailable(lang, country, variant)
-        currentLanguage.value = arrayOf<String>(lang, country, variant)
+        currentLanguage.clear()
+        currentLanguage.addAll(arrayOf<String>(lang, country, variant))
         return result
     }
 
