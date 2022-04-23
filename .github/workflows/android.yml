@@ -45,8 +45,9 @@ jobs:
       # 下载tensorflow-lite-aars
       - name: Download 下载models-tflite.7z
         run: |
-          wget https://github.com/benjaminwan/ChineseTtsTflite/releases/download/init/tensorflow-lite-2.8.0.aar -O tensorflow-lite-aars/tensorflow-lite-2.8.0.aar
-          wget https://github.com/benjaminwan/ChineseTtsTflite/releases/download/init/tensorflow-lite-select-tf-ops-2.8.0.aar -O tensorflow-lite-aars/tensorflow-lite-select-tf-ops-2.8.0.aar
+          mkdir -p app/libs
+          wget https://github.com/benjaminwan/ChineseTtsTflite/releases/download/init/tensorflow-lite-2.8.0.aar -O app/libs/tensorflow-lite-2.8.0.aar
+          wget https://github.com/benjaminwan/ChineseTtsTflite/releases/download/init/tensorflow-lite-select-tf-ops-2.8.0.aar -O app/libs/tensorflow-lite-select-tf-ops-2.8.0.aar
 
       # Assemble Release apk
       - name: Build with Gradle

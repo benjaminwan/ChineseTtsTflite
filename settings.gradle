@@ -5,9 +5,6 @@ dependencyResolutionManagement {
         mavenCentral()
         jcenter() // Warning: this repository is going to shut down soon
         maven { url "https://jitpack.io" }
-        flatDir {
-            dirs 'tensorflow-lite-aars'
-        }
     }
 }
 rootProject.name = "ChineseTtsTflite"
