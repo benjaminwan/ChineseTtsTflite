@@ -21,6 +21,7 @@
 
 1. Android 2021.1.1 Patch 3
 2. 从下面的模型下载地址，下载models-tflite.7z，把如下4个文件解压到对应目录
+3. 从下面的aar下载地址，下载裁剪版TensorFlow Lite的aar，把2个aar文件放到app/libs
 
 ```
 ├─app/src/main/assets
@@ -49,14 +50,13 @@
 
 ### 裁剪TensorFlow Lite
 
-[缩减 TensorFlow Lite 二进制文件大小](https://tensorflow.google.cn/lite/guide/reduce_binary_size)
+[缩减TensorFlow Lite二进制文件大小](https://tensorflow.google.cn/lite/guide/reduce_binary_size)
 
 [裁剪后aar下载](https://github.com/benjaminwan/ChineseTtsTflite/releases/tag/init)
 
 裁剪前后的arr文件大小对比：
-
-tensorflow-lite-2.8.0.aar: 5.4MB -> 3.7MB (68.5%)
-tensorflow-lite-select-tf-ops-2.8.0.aar: 109.6MB -> 14.8MB (13.5%)
+* tensorflow-lite-2.8.0.aar: 5.4MB -> 3.7MB (68.5%)
+* tensorflow-lite-select-tf-ops-2.8.0.aar: 109.6MB -> 14.8MB (13.5%)
 
 ### 参考资料
 
