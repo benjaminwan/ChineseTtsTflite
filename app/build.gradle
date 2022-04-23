@@ -73,6 +73,7 @@ android {
 }
 
 dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
     // Test
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
@@ -97,10 +98,19 @@ dependencies {
     //Logger
     implementation 'com.orhanobut:logger:2.2.0'
 
-    // Tensorflow Lite
-    implementation 'org.tensorflow:tensorflow-lite:2.8.0'
-    implementation 'org.tensorflow:tensorflow-lite-select-tf-ops:2.8.0'
-    implementation 'org.tensorflow:tensorflow-lite-support:0.3.1'
+    // Tensorflow Lite Maven
+    //implementation 'org.tensorflow:tensorflow-lite:2.8.0'
+    //implementation 'org.tensorflow:tensorflow-lite-select-tf-ops:2.8.0'
+    //implementation 'org.tensorflow:tensorflow-lite-support:0.3.1'
+
+    // Tensorflow Lite Local
+    implementation('org.tensorflow:tensorflow-lite-support:0.3.1') {
+        exclude group: 'org.tensorflow', module: 'tensorflow-lite'
+        exclude group: 'org.tensorflow', module: 'tensorflow-lite-api'
+        exclude group: 'org.tensorflow', module: 'tensorflow-lite-select-tf-ops'
+    }
+    implementation(name: 'tensorflow-lite-2.8.0', ext: 'aar')
+    implementation(name: 'tensorflow-lite-select-tf-ops-2.8.0', ext: 'aar')
 
     // https://github.com/belerweb/pinyin4j
     implementation 'com.belerweb:pinyin4j:2.5.1'
