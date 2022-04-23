@@ -109,8 +109,8 @@ dependencies {
         exclude group: 'org.tensorflow', module: 'tensorflow-lite-api'
         exclude group: 'org.tensorflow', module: 'tensorflow-lite-select-tf-ops'
     }
-    implementation(name: 'tensorflow-lite-2.8.0', ext: 'aar')
-    implementation(name: 'tensorflow-lite-select-tf-ops-2.8.0', ext: 'aar')
+    //implementation(name: 'tensorflow-lite-2.8.0', ext: 'aar')
+    //implementation(name: 'tensorflow-lite-select-tf-ops-2.8.0', ext: 'aar')
 
     // https://github.com/belerweb/pinyin4j
     implementation 'com.belerweb:pinyin4j:2.5.1'
