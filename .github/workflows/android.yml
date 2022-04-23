@@ -42,6 +42,12 @@ jobs:
           7z x models-tflite.7z -aoa
           mv models-tflite app/src/main/assets
 
+      # 下载tensorflow-lite-aars
+      - name: Download 下载models-tflite.7z
+        run: |
+          wget https://github.com/benjaminwan/ChineseTtsTflite/releases/download/init/tensorflow-lite-2.8.0.aar -O tensorflow-lite-aars/tensorflow-lite-2.8.0.aar
+          wget https://github.com/benjaminwan/ChineseTtsTflite/releases/download/init/tensorflow-lite-select-tf-ops-2.8.0.aar -O tensorflow-lite-aars/tensorflow-lite-select-tf-ops-2.8.0.aar
+
       # Assemble Release apk
       - name: Build with Gradle
         run: chmod +x gradlew &&./gradlew assembleRelease
