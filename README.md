@@ -53,7 +53,9 @@
 
 [裁剪后aar下载](https://github.com/benjaminwan/ChineseTtsTflite/releases/tag/init)
 
-裁剪前后的arr文件大小对比： tensorflow-lite-2.8.0.aar: 5.4MB -> 3.7MB (68.5%)
+裁剪前后的arr文件大小对比：
+
+tensorflow-lite-2.8.0.aar: 5.4MB -> 3.7MB (68.5%)
 tensorflow-lite-select-tf-ops-2.8.0.aar: 109.6MB -> 14.8MB (13.5%)
 
 ### 参考资料
