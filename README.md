@@ -19,7 +19,7 @@
 
 ### 手动编译说明
 
-1. Android 2021.1.1 Patch 3
+1. Android Studio 2021.2.1
 2. 从下面的模型下载地址，下载models-tflite.7z，把如下4个文件解压到对应目录
 3. 从下面的aar下载地址，下载裁剪版TensorFlow Lite的aar，把2个aar文件放到app/libs
 
