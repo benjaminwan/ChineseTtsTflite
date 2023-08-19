@@ -1,0 +1,9 @@
+使用 Kotlin + JetPack Compose + Tensorflow Lite 开发的 TTS 引擎，可以完全离线使用。
+
+可选两种模型：FastSpeech 和 Tacotron，这两种模型均来自 TensorflowTTS。
+
+因为是实时推理输出音频，故对设备性能有一定要求。
+
+其中 FastSpeech 速度较快，但生成的音频拟人效果较差，可以用于普通中端以上手机。
+
+而 Tacotron 对性能要求较高，虽然总体效果更好，但因为速度很慢，故目前实用价值不大，仅供测试。
