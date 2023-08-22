@@ -1,0 +1,7 @@
+A TTS engine developed with Kotlin + JetPack Compose + Tensorflow Lite, which works totally offline.
+
+There are two models available: FastSpeech and Tacotron, both of which are from TensorflowTTS.
+
+Because the voice is generated in real-time, it has high performance requirements.
+
+The FastSpeech model works fast but the generated voice has poor anthropomorphic effect. It works well on a middle-end device. The Tacotron has high performance requirements. Though the overall effect is better, the speed is very slow. Therefore it's bundled only for test and can't be used in practice.

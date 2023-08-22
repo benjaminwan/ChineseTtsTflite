@@ -103,4 +103,4 @@ $ python convert-tflite.py
 
 ### APP界面截图
 
-![avatar](capture/sample.png)
+![avatar](./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png)
